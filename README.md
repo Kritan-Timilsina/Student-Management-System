@@ -1,6 +1,6 @@
 # Student-Management-System
-In this Project I will be Creating Command Line Interface Based Student-Management-System
-Data is stored in students.txt file which is generated automatically at runtime.
+In this project, I have created a CLI-based Student-Management-System
+Data is stored in "students.txt" using File Handling, which is generated automatically at runtime.
 
 Features:
 -Add Student
