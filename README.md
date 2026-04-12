@@ -1,6 +1,8 @@
-# College-Management-System
-In this Project I will be Creating Command Line Interface Based College-Management-System
+# Student-Management-System
+In this Project I will be Creating Command Line Interface Based Student-Management-System
+Data is stored in students.txt file which is generated automatically at runtime.
 
+Features:
 -Add Student
 -Display All Students
 -Search Student (by ID)
@@ -9,6 +11,4 @@ In this Project I will be Creating Command Line Interface Based College-Manageme
 -Update student details
 -Prevent duplicate IDs
 -Better UI/menu formatting
--Sorting students
--Full name support (spaces in name)
--Marks / grades field
+

@@ -1,2 +1,0 @@
-1,Krish,Maths,first,2001
-2,Kritan Timilsina,Computer Engineering,Third,2004

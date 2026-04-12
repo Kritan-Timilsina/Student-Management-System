@@ -99,14 +99,14 @@ def updateStudent():#This function is used to update student info with help of r
                     s.semester=input("Enter semester to be updated:").strip()
                     s.byear=input("Enter Date of birth to be updated:")
                     print("Students Data updated Sucessfully")
-                    updatefile()
-                    print("---------------------------------------------------------------------------")
                     break
                 except:
                     print("Please enter valid input.")
                     return
                 print("-----------------------------------------------------------------------------")
-        if found==False:   
+        if found==True:
+            updatefile()   
+        else:    
             print("Student not found!!!")
             print("----------------------------------------------------------------------------------")
         
