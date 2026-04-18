@@ -1,5 +1,5 @@
 print("Student Management System")
-print("----------------------------------")
+print("-"*70)
 
 # -------------------------------Class Section Starts Here-------------------
 from db import get_connection
@@ -73,7 +73,7 @@ def addStudent():  # This Function adds student
         byear = int(input("Enter your Birth Year:"))
     except:
         print("Please enter valid input.")
-        print("--------------------------------------------------------------------------------------")
+        print("-"*70)
         return
     try:
         cur.execute("""
@@ -81,7 +81,7 @@ def addStudent():  # This Function adds student
                     values(%s,%s,%s,%s,%s,%s)""",(roll,name,gender,degree,semester,byear))
         conn.commit()
         print("Data of student have been inserted.")
-        print("--------------------------------------------------------------------------------------------")
+        print("-"*70)
     except Exception as e :
         print("Error:",e)
     finally:  
@@ -90,7 +90,7 @@ def addStudent():  # This Function adds student
     # s = Student(roll, name, gender, degree, semester, byear)
     # studentslist.append(s)
     
-    print("-----------------------------------------------------------------------------")
+    print("-"*70)
     # updatefile()
 
 
@@ -110,10 +110,10 @@ def displayStudent():  # This Displays Student With the help of their roll numbe
             return 
         
         print(f"Roll:{student[0]}\nName:{student[1]}\nGender:{student[2]}\nDegree:{student[3]}\nSemester:{student[4]}\nBirth Year:{student[5]}\n")
-        print("------------------------------------------------------------------------------------------------------------------------")
+        print("-"*70)
     except:
         print("Please enter valid input.")
-        print("-----------------------------------------------------------------------------------------------------------------")
+        print("-"*70)
         return
     finally:
         if cur:
@@ -152,7 +152,7 @@ def deleteStudent():  # This function is used to delete student data from databa
         cur.execute("delete from students where roll=%s",(roll,))
         conn.commit()
         print("Student Data Deleted Sucessfully")
-        print("----------------------------------------------------------------------------------------")
+        print("-"*70)
     except Exception as e:
         print("Error:",e)
     finally:
@@ -192,7 +192,7 @@ def updateStudent():  # This function is used to update student info with help o
         student=cur.fetchone()
         if not student:
             print("Student With This roll number doesn't exist")
-            print("---------------------------------------------------------------------------")
+            print("-"*70)
             return
         name=(input("Enter New Name:"))
         gender=(input("Enter Gender:"))
@@ -204,12 +204,12 @@ def updateStudent():  # This function is used to update student info with help o
                         gender=%s,
                         degree=%s,
                         semester=%s,
-                        birthyear=%s
+                        byear=%s
                         Where roll=%s""",(name,gender,degree,semester,byear,roll))
 
         conn.commit()
         print("Student Updated Sucessfully")
-        print("-------------------------------------------------------------------------------")
+        print("-"*70)
     except Exception as e:
         print("Error:",e)
     finally:
@@ -250,44 +250,71 @@ def updateStudent():  # This function is used to update student info with help o
 
 
 def displayAll():  # This program is used to display all students data
-    print("------------------Data of Student ----------------------------------------")
-    if len(studentslist) == 0:
-        print("No students in list")
-        print("--------------------------------------------------")
-        return
-    for s in studentslist:
-        print(f"ID:{s.roll}\nName:{s.name}\nGender:{s.gender}Date of Birth:{s.byear}\nDegree:{s.degree}\nSemester:{s.semester}\n")
-        print("-------------------------------------------------------------------------------------")
+    conn=None
+    cur=None
+    try:
+        conn=get_connection()
+        cur=conn.cursor()
+        cur.execute("Select * from students")
+        allstudents=cur.fetchall()
+        if not allstudents :
+            print("Table is empty!")
+            print("-"*70)
+            return 
+        print(f"{'Roll':<6}{'Name':<40}{'Gender':<10}{'Degree':<10}{'Semester':<10}{'Birth Year':<10}")
+        print("-" * 100)
+
+        print("-"*70)
+        for s in allstudents:
+            print(f"{s[0]:<6}{s[1]:<25}{s[2]:<10}{s[3]:<10}{s[4]:<10}{s[5]:<10}")
+        print("-"*100)
+    
+    except Exception as e:
+        print("Error:",e)
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+    # print("------------------Data of Student ----------------------------------------")
+    # if len(studentslist) == 0:
+    #     print("No students in list")
+    #     print("--------------------------------------------------")
+    #     return
+    # for s in studentslist:
+    #     print(f"ID:{s.roll}\nName:{s.name}\nGender:{s.gender}Date of Birth:{s.byear}\nDegree:{s.degree}\nSemester:{s.semester}\n")
+    #     print("-------------------------------------------------------------------------------------")
 
 
 #def updatefile():
 
-    with open('students.txt', 'w') as f:
-        for s in studentslist:
-            data = f"{s.roll},{s.name},{s.gender},{s.degree},{s.semester},{s.byear}\n"
-            f.write(data)
+    # with open('students.txt', 'w') as f:
+    #     for s in studentslist:
+    #         data = f"{s.roll},{s.name},{s.gender},{s.degree},{s.semester},{s.byear}\n"
+    #         f.write(data)
 
 
 #def loadFromFile():
-    studentslist.clear()
-    try:
-        with open('students.txt', 'r') as f:
-            for line in f:
+    # studentslist.clear()
+    # try:
+    #     with open('students.txt', 'r') as f:
+    #         for line in f:
 
-                data = line.strip().split(',')
-                if len(data) != 6:
-                    continue
-                roll = int(data[0])
-                name = data[1]
-                gender = data[2]
-                degree = data[3]
-                semester = data[4]
-                byear = data[5]
-                s = Student(roll, name, gender, degree, semester, byear)
-                studentslist.append(s)
-    except FileNotFoundError:
-        print("Loading of file failed")
-        return
+    #             data = line.strip().split(',')
+    #             if len(data) != 6:
+    #                 continue
+    #             roll = int(data[0])
+    #             name = data[1]
+    #             gender = data[2]
+    #             degree = data[3]
+    #             semester = data[4]
+    #             byear = data[5]
+    #             s = Student(roll, name, gender, degree, semester, byear)
+    #             studentslist.append(s)
+    # except FileNotFoundError:
+    #     print("Loading of file failed")
+    #     return
 
 # -------------------------Main Body------------------------------------
 
@@ -300,7 +327,7 @@ while (True):
     print("4. Delete Student Info")
     print("5. Display All Students")
     print("6. Terminate Program")
-    print("--------------------------------------------------------------------------")
+    print("-"*70)
     try:
         choice = int(input("Enter Your Choice:"))
     except:
@@ -319,5 +346,5 @@ while (True):
         displayAll()
     elif choice == 6:
         print("Terminating the Program.")
-        print("=======================================================================================")
+        print("="*70)
         break
