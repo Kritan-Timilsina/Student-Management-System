@@ -2,7 +2,7 @@ print("Student Management System")
 print("----------------------------------")
 
 # -------------------------------Class Section Starts Here-------------------
-
+from db import get_connection
 
 class Student:
     def __init__(self, roll, name, gender, degree, semester, byear):
@@ -18,6 +18,26 @@ class Student:
 
 studentslist = []
 # ------------------------Functions--------------------------------------
+def create_table(): # create table if it doesnot exist 
+    conn=get_connection()
+    cur=conn.cursor()
+    try:
+        cur.execute("""CREATE TABLE IF NOT EXISTS students(
+            roll int primary key,
+            name varchar (50),
+            gender varchar (10),
+            degree varchar(20),
+            semester int,
+            byear int not null );""")
+        print("Table Created Sucessfully!!!")
+
+        conn.commit()
+    except Exception as e:
+        print("Error",e)
+    finally:
+        cur.close()
+        conn.close()
+    
 
 
 def addStudent():  # This Function adds student
