@@ -73,6 +73,7 @@ def addStudent():  # This Function adds student
         byear = int(input("Enter your Birth Year:"))
     except:
         print("Please enter valid input.")
+        print("--------------------------------------------------------------------------------------")
         return
     try:
         cur.execute("""
@@ -80,6 +81,7 @@ def addStudent():  # This Function adds student
                     values(%s,%s,%s,%s,%s,%s)""",(roll,name,gender,degree,semester,byear))
         conn.commit()
         print("Data of student have been inserted.")
+        print("--------------------------------------------------------------------------------------------")
     except Exception as e :
         print("Error:",e)
     finally:  
@@ -93,23 +95,31 @@ def addStudent():  # This Function adds student
 
 
 def displayStudent():  # This Displays Student With the help of their roll number.
-    conn=get_connection()
-    cur=conn.cursor()
+    cur=None
+    conn=None 
+
+    
     try:
+        conn=get_connection()
+        cur=conn.cursor()
         roll = int(input("Enter roll no of Desired Student:"))
-        cur.execute("""Select roll from students where roll =%s""",(roll,))
+        cur.execute("""Select * from students where roll =%s""",(roll,))
         student=cur.fetchone()
         if not student:
             print("Student with this roll doesnot exists")
             return 
         
         print(f"Roll:{student[0]}\nName:{student[1]}\nGender:{student[2]}\nDegree:{student[3]}\nSemester:{student[4]}\nBirth Year:{student[5]}\n")
+        print("------------------------------------------------------------------------------------------------------------------------")
     except:
         print("Please enter valid input.")
+        print("-----------------------------------------------------------------------------------------------------------------")
         return
     finally:
-        cur.close()
-        conn.close()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
     
     
     # for s in studentslist:
@@ -126,25 +136,49 @@ def displayStudent():  # This Displays Student With the help of their roll numbe
     #     print("-------------------------------------------------------------------------------")
 
 
-def deleteStudent():  # This function is used to delete student data from list
-    found = False
+def deleteStudent():  # This function is used to delete student data from database
+    conn=None
+    cur=None
     try:
-        seek = int(input("Enter roll no of Desired Student:"))
-    except:
-        print("Please enter valid input")
-        return
-    for s in studentslist:
-        if seek == s.roll:
-            found = True
-            studentslist.remove(s)
-            print("Students Data have been removed Sucessfully.")
-            updatefile()
-            print(
-                "-----------------------------------------------------------------------------")
-            break
-    if found == False:
-        print("Student not found!!! ")
-        print("---------------------------------------------------------------------------------")
+        roll=int(input("Enter roll number of student:"))
+        conn=get_connection()
+        cur=conn.cursor()
+        cur.execute("select * from students where roll=%s",(roll,))
+        student=cur.fetchone()
+        if not student:
+            print("Student Doesn't Exist with this roll number!!!")
+            return 
+        
+        cur.execute("delete from students where roll=%s",(roll,))
+        conn.commit()
+        print("Student Data Deleted Sucessfully")
+        print("----------------------------------------------------------------------------------------")
+    except Exception as e:
+        print("Error:",e)
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        
+    # found = False
+    # try:
+    #     seek = int(input("Enter roll no of Desired Student:"))
+    # except:
+    #     print("Please enter valid input")
+    #     return
+    # for s in studentslist:
+    #     if seek == s.roll:
+    #         found = True
+    #         studentslist.remove(s)
+    #         print("Students Data have been removed Sucessfully.")
+    #         updatefile()
+    #         print(
+    #             "-----------------------------------------------------------------------------")
+    #         break
+    # if found == False:
+    #     print("Student not found!!! ")
+    #     print("---------------------------------------------------------------------------------")
 
 
 def updateStudent():  # This function is used to update student info with help of roll number
@@ -248,4 +282,5 @@ while (True):
         displayAll()
     elif choice == 6:
         print("Terminating the Program.")
+        print("=======================================================================================")
         break
