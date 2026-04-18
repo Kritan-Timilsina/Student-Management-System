@@ -46,28 +46,50 @@ def addStudent():  # This Function adds student
     except:
         print("Please enter valid input.")
         return
+    conn=get_connection()
+    cur=conn.cursor()
+    cur.execute("""
+        select 1 from students where roll =%s
+        """,(roll,))
+    exist=cur.fetchone()
+    if exist:
+        print("This Student Already Exists in database")
+        cur.close()
+        conn.close()
+        return 
 
-    for s in studentslist:
-        if roll == s.roll:
-            print("Student Having this roll number already Exists")
-            print(
-                "-----------------------------------------------------------------------------")
-            return
+    # for s in studentslist:
+    #     if roll == s.roll:
+    #         print("Student Having this roll number already Exists")
+    #         print(
+    #             "-----------------------------------------------------------------------------")
+    #         return
 
     try:
         name = str(input("Enter your name:"))
         gender = str(input("Enter your Gender:"))
         degree = str(input("Enter your Degree:"))
-        semester = str(input("Enter your Semester:"))
-        byear = str(input("Enter your Birth Year:"))
+        semester = int(input("Enter your Semester:"))
+        byear = int(input("Enter your Birth Year:"))
     except:
         print("Please enter valid input.")
         return
-    s = Student(roll, name, gender, degree, semester, byear)
-    studentslist.append(s)
-    print("Data of student have been inserted.")
+    try:
+        cur.execute("""
+        Insert into students(roll,name,gender,degree,semester,byear)
+                    values(%s,%s,%s,%s,%s,%s)""",(roll,name,gender,degree,semester,byear))
+        conn.commit()
+        print("Data of student have been inserted.")
+    except Exception as e :
+        print("Error:",e)
+    finally:  
+        cur.close()
+        conn.close()
+    # s = Student(roll, name, gender, degree, semester, byear)
+    # studentslist.append(s)
+    
     print("-----------------------------------------------------------------------------")
-    updatefile()
+    # updatefile()
 
 
 def displayStudent():  # This Displays Student With the help of their roll number.
