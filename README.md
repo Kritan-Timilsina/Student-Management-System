@@ -1,14 +1,19 @@
-# Student-Management-System
-In this project, I have created a CLI-based Student-Management-System
-Data is stored in "students.txt" using File Handling, which is generated automatically at runtime.
+💻 Student Management System (CLI-based)
 
-Features:
--Add Student
--Display All Students
--Search Student (by ID)
--Delete Student
--Store data (file handling or memory)
--Update student details
--Prevent duplicate IDs
--Better UI/menu formatting
+A command-line Student Management System built using Python and PostgreSQL.
+It allows users to manage student records through a simple terminal interface with full database integration.
 
+🚀 Features
+➕ Add new student records
+🔍 Search student by roll number
+📄 Display individual student details
+📋 Display all students in formatted table
+✏️ Update student information
+❌ Delete student records
+🗄️ PostgreSQL database integration
+🔐 Safe SQL queries using parameterized statements
+🛠️ Tech Stack
+Python 3
+PostgreSQL
+psycopg2 (Python PostgreSQL driver)
+CLI (Command Line Interface)
