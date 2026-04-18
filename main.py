@@ -182,34 +182,71 @@ def deleteStudent():  # This function is used to delete student data from databa
 
 
 def updateStudent():  # This function is used to update student info with help of roll number
-    found = False
+    conn=None
+    cur=None
     try:
-        seek = int(input("Enter roll no of Desired Student:"))
-    except:
-        print("Please enter valid input.")
-        return
-    for s in studentslist:
-        if s.roll == seek:
-            found = True
-            try:
-                s.name = input("Enter name to be updated:").strip()
-                s.degree = input("Enter degree to be updated:").strip()
-                s.gender = input("Enter gender to be upgraded:").strip()
-                s.semester = input("Enter semester to be updated:").strip()
-                s.byear = input("Enter Date of birth to be updated:")
-                print("Students Data updated Sucessfully")
-                updatefile()
-                print(
-                    "---------------------------------------------------------------------------")
-                break
-            except:
-                print("Please enter valid input.")
-                return
-            print(
-                "-----------------------------------------------------------------------------")
-    if found == False:
-        print("Student not found!!!")
-        print("----------------------------------------------------------------------------------")
+        conn=get_connection()
+        cur=conn.cursor()
+        roll=int(input("Enter Roll Number:"))
+        cur.execute("""select * from students where roll = %s""",(roll,))
+        student=cur.fetchone()
+        if not student:
+            print("Student With This roll number doesn't exist")
+            print("---------------------------------------------------------------------------")
+            return
+        name=(input("Enter New Name:"))
+        gender=(input("Enter Gender:"))
+        degree=input("Enter Degree:")
+        semester=int(input("Enter Semester:"))
+        byear=int(input("Enter Birth Year:"))
+        cur.execute("""Update students
+                        set name=%s,
+                        gender=%s,
+                        degree=%s,
+                        semester=%s,
+                        birthyear=%s
+                        Where roll=%s""",(name,gender,degree,semester,byear,roll))
+
+        conn.commit()
+        print("Student Updated Sucessfully")
+        print("-------------------------------------------------------------------------------")
+    except Exception as e:
+        print("Error:",e)
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        
+
+    # found = False
+    # try:
+    #     seek = int(input("Enter roll no of Desired Student:"))
+    # except:
+    #     print("Please enter valid input.")
+    #     return
+    # for s in studentslist:
+    #     if s.roll == seek:
+    #         found = True
+    #         try:
+    #             s.name = input("Enter name to be updated:").strip()
+    #             s.degree = input("Enter degree to be updated:").strip()
+    #             s.gender = input("Enter gender to be upgraded:").strip()
+    #             s.semester = input("Enter semester to be updated:").strip()
+    #             s.byear = input("Enter Date of birth to be updated:")
+    #             print("Students Data updated Sucessfully")
+    #             #updatefile()
+    #             print(
+    #                 "---------------------------------------------------------------------------")
+    #             break
+    #         except:
+    #             print("Please enter valid input.")
+    #             return
+    #         print(
+    #             "-----------------------------------------------------------------------------")
+    # if found == False:
+    #     print("Student not found!!!")
+    #     print("----------------------------------------------------------------------------------")
 
 
 def displayAll():  # This program is used to display all students data
@@ -223,7 +260,7 @@ def displayAll():  # This program is used to display all students data
         print("-------------------------------------------------------------------------------------")
 
 
-def updatefile():
+#def updatefile():
 
     with open('students.txt', 'w') as f:
         for s in studentslist:
@@ -231,7 +268,7 @@ def updatefile():
             f.write(data)
 
 
-def loadFromFile():
+#def loadFromFile():
     studentslist.clear()
     try:
         with open('students.txt', 'r') as f:
@@ -255,7 +292,7 @@ def loadFromFile():
 # -------------------------Main Body------------------------------------
 
 
-loadFromFile()
+#loadFromFile()
 while (True):
     print("1. Enter a Student")
     print("2. Display Students Info")
