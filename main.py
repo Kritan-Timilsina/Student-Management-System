@@ -93,25 +93,37 @@ def addStudent():  # This Function adds student
 
 
 def displayStudent():  # This Displays Student With the help of their roll number.
+    conn=get_connection()
+    cur=conn.cursor()
     try:
-        seek = int(input("Enter roll no of Desired Student:"))
+        roll = int(input("Enter roll no of Desired Student:"))
+        cur.execute("""Select roll from students where roll =%s""",(roll,))
+        student=cur.fetchone()
+        if not student:
+            print("Student with this roll doesnot exists")
+            return 
+        
+        print(f"Roll:{student[0]}\nName:{student[1]}\nGender:{student[2]}\nDegree:{student[3]}\nSemester:{student[4]}\nBirth Year:{student[5]}\n")
     except:
         print("Please enter valid input.")
         return
-
-    found = False
-    for s in studentslist:
-        if seek == s.roll:
-            found = True
-            print("Data is Displayed below\n")
-            print(
-                f"ID:{s.roll}\nName:{s.name}\nGender:{s.gender}\nDate of Birth:{s.byear}\nDegree:{s.degree}\nSemester:{s.semester}\n")
-            print(
-                "-----------------------------------------------------------------------------")
-            break
-    if not found:
-        print("Student does not Exist")
-        print("-------------------------------------------------------------------------------")
+    finally:
+        cur.close()
+        conn.close()
+    
+    
+    # for s in studentslist:
+    #     if seek == s.roll:
+    #         found = True
+    #         print("Data is Displayed below\n")
+    #         print(
+    #             f"ID:{s.roll}\nName:{s.name}\nGender:{s.gender}\nDate of Birth:{s.byear}\nDegree:{s.degree}\nSemester:{s.semester}\n")
+    #         print(
+    #             "-----------------------------------------------------------------------------")
+    #         break
+    # if not found:
+    #     print("Student does not Exist")
+    #     print("-------------------------------------------------------------------------------")
 
 
 def deleteStudent():  # This function is used to delete student data from list
