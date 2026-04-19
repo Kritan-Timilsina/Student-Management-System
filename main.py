@@ -16,12 +16,13 @@ class Student:
 
 
 
-studentslist = []
+
 # ------------------------Functions--------------------------------------
 def create_table(): # create table if it doesnot exist 
-    conn=get_connection()
-    cur=conn.cursor()
+    
     try:
+        conn=get_connection()
+        cur=conn.cursor()
         cur.execute("""CREATE TABLE IF NOT EXISTS students(
             roll int primary key,
             name varchar (50),
@@ -29,14 +30,26 @@ def create_table(): # create table if it doesnot exist
             degree varchar(20),
             semester int,
             byear int not null );""")
-        print("Table Created Sucessfully!!!")
+
+        print("-"*70)
+        cur.execute("""CREATE TABLE IF NOT Exists marks(
+                    id serial Primary Key,
+                    subjectcode varchar (20),
+                    roll integer,
+                    subject varchar (50),
+                    marks integer check (marks < 101),
+                    foreign key (roll) references students(roll) on delete cascade );""")
+        
+        print("-"*70)
 
         conn.commit()
     except Exception as e:
         print("Error",e)
     finally:
-        cur.close()
-        conn.close()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
     
 
 
@@ -86,6 +99,70 @@ def addStudent():  # This Function adds student
     print("-"*70)
     
 
+def add_marks():
+    cur=None
+    conn=None
+    try:
+        conn=get_connection()
+        cur=conn.cursor()
+        roll=int(input("Enter roll number: "))
+        cur.execute("Select * from students where roll=%s",(roll,))
+        exist=cur.fetchone()
+        if not exist:
+            print("Student Doesnot Exist!!!")
+            cur.close()
+            conn.close()
+            return 
+        subject=(input("Enter Subject: "))
+        subjectcode=(input("Enter Subject Code: ")).lower().strip()
+        marks=int(input("Enter marks: "))
+        if marks<0 or marks>100:
+            print("Invalid Marks!")
+            print("-"*70)
+            return 
+        cur.execute("""Insert into marks (roll,subject,subjectcode,marks)
+                    values
+                    (%s,%s,%s,%s) 
+                    """,(roll,subject,subjectcode,marks))
+        conn.commit()
+        print("Marks Inserted Sucessfully!!!")
+        print("-"*70)
+    except Exception as e:
+        print("Error:",e)
+        print("-"*70)
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+def display_marks():
+    cur=None
+    conn=None
+    try:
+        conn=get_connection()
+        cur=conn.cursor()
+        roll=int(input("Enter roll Number: "))
+        cur.execute("""select s.name,m.subject,m.subjectcode,m.marks from students s 
+                    inner join marks m on s.roll=m.roll
+                    where s.roll=%s
+        """,(roll,))
+        data=cur.fetchall()
+        if not data:
+            print("No data found")
+            return 
+        print(f"{'Name':<40}{'Subject':<40}{'Subject code':<20}{'Marks':<10}")
+        for mark in data:
+            print(f"{mark[0]:<40}{mark[1]:<40}{mark[2]:<20}{mark[3]:<10}")
+
+    except Exception as e:
+        print("Error:",e)
+        print("-"*70)
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+    
 
 def displayStudent():  # This Displays Student With the help of their roll number.
     cur=None
@@ -129,7 +206,7 @@ def deleteStudent():  # This function is used to delete student data from databa
             print("Student Doesn't Exist with this roll number!!!")
             return 
         
-        cur.execute("delete from students where roll=%s",(roll,))
+        cur.execute("delete from students where roll=%s ",(roll,))
         conn.commit()
         print("Student Data Deleted Sucessfully")
         print("-"*70)
@@ -195,7 +272,7 @@ def displayAll():  # This program is used to display all students data
         print(f"{'Roll':<6}{'Name':<40}{'Gender':<10}{'Degree':<25}{'Semester':<10}{'Birth Year':<10}")
         print("-" * 100)
 
-        print("-"*70)
+        
         for s in allstudents:
             print(f"{s[0]:<6}{s[1]:<40}{s[2]:<10}{s[3]:<25}{s[4]:<10}{s[5]:<10}")
         print("-"*100)
@@ -214,14 +291,16 @@ def displayAll():  # This program is used to display all students data
 # -------------------------Main Body------------------------------------
 
 
-
+create_table()
 while (True):
     print("1. Enter a Student")
     print("2. Display Students Info")
     print("3. Update Student Info")
     print("4. Delete Student Info")
     print("5. Display All Students")
-    print("6. Terminate Program")
+    print("6. Add Marks")
+    print("7. Display Marks")
+    print("8. Terminate Program")
     print("-"*70)
     try:
         choice = int(input("Enter Your Choice:"))
@@ -239,7 +318,11 @@ while (True):
         deleteStudent()
     elif choice == 5:
         displayAll()
-    elif choice == 6:
+    elif choice ==6:
+        add_marks()
+    elif choice == 7:
+        display_marks()
+    elif choice == 8:
         print("Terminating the Program.")
         print("="*70)
         break
