@@ -4,19 +4,6 @@ print("-"*70)
 # -------------------------------Class Section Starts Here-------------------
 from db import get_connection
 
-class Student:
-    def __init__(self, roll, name, gender, degree, semester, byear):
-        self.roll = roll
-        self.name = name
-        self.gender = gender
-        self.degree = degree
-        self.semester = semester
-        self.byear = byear
-
-
-
-
-
 # ------------------------Functions--------------------------------------
 def create_table(): # create table if it doesnot exist 
     
@@ -31,16 +18,17 @@ def create_table(): # create table if it doesnot exist
             semester int,
             byear int not null );""")
 
-        print("-"*70)
         cur.execute("""CREATE TABLE IF NOT Exists marks(
                     id serial Primary Key,
                     subjectcode varchar (20),
+                    credit int,
                     roll integer,
                     subject varchar (50),
-                    marks integer check (marks < 101),
-                    foreign key (roll) references students(roll) on delete cascade );""")
+                    marks integer check (marks between 0 and 100),
+                    foreign key (roll) references students(roll) on delete cascade
+                    unique(roll,subjectcode) );""")
         
-        print("-"*70)
+        
 
         conn.commit()
     except Exception as e:
@@ -110,20 +98,20 @@ def add_marks():
         exist=cur.fetchone()
         if not exist:
             print("Student Doesnot Exist!!!")
-            cur.close()
-            conn.close()
+
             return 
         subject=(input("Enter Subject: "))
         subjectcode=(input("Enter Subject Code: ")).lower().strip()
+        credit=int(input("Enter Credit: "))
         marks=int(input("Enter marks: "))
         if marks<0 or marks>100:
             print("Invalid Marks!")
             print("-"*70)
             return 
-        cur.execute("""Insert into marks (roll,subject,subjectcode,marks)
+        cur.execute("""Insert into marks (roll,subject,subjectcode,credit,marks)
                     values
-                    (%s,%s,%s,%s) 
-                    """,(roll,subject,subjectcode,marks))
+                    (%s,%s,%s,%s,%s) 
+                    """,(roll,subject,subjectcode,credit,marks))
         conn.commit()
         print("Marks Inserted Sucessfully!!!")
         print("-"*70)
@@ -142,7 +130,7 @@ def display_marks():
         conn=get_connection()
         cur=conn.cursor()
         roll=int(input("Enter roll Number: "))
-        cur.execute("""select s.name,m.subject,m.subjectcode,m.marks from students s 
+        cur.execute("""select s.name,m.subject,m.subjectcode,m.credit,m.marks from students s 
                     inner join marks m on s.roll=m.roll
                     where s.roll=%s
         """,(roll,))
@@ -150,9 +138,9 @@ def display_marks():
         if not data:
             print("No data found")
             return 
-        print(f"{'Name':<40}{'Subject':<40}{'Subject code':<20}{'Marks':<10}")
+        print(f"{'Name':<40}{'Subject':<40}{'Subject code':<20}{'Credit':<10}{'Marks':<10}")
         for mark in data:
-            print(f"{mark[0]:<40}{mark[1]:<40}{mark[2]:<20}{mark[3]:<10}")
+            print(f"{mark[0]:<40}{mark[1]:<40}{(mark[2]or "").upper():<20}{mark[3]:<10}{mark[4]:<10}")
 
     except Exception as e:
         print("Error:",e)
@@ -190,7 +178,7 @@ def displayStudent():  # This Displays Student With the help of their roll numbe
             cur.close()
         if conn:
             conn.close()
-    
+
 
 
 def deleteStudent():  # This function is used to delete student data from database
